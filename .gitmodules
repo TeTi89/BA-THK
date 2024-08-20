@@ -1,0 +1,3 @@
+[submodule "cs-fmu-mapper"]
+	path = cs-fmu-mapper
+	url = https://github.com/marvin-schl/cs-fmu-mapper
