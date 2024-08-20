@@ -1,0 +1,8 @@
+Ablauf:
+1. CODESYS starten und PLC anbinden # OPC/UA Server starten
+2. python skript starten # OPC/UA Client starten
+3. PLC von Stop auf Laufen bringen
+
+
+Zum Starten
+PS G:\workspaces\vsCodeProjects\BA-THK> python cs-fmu-mapper/main.py -c config/config.yaml

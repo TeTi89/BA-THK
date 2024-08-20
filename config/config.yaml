@@ -1,0 +1,289 @@
+#Master:
+#  type: standalone-master
+#  timeStepPerCycle: 0.01
+#  tend: 4
+
+
+############################################################################################################################################################################################################################################
+# FMU Components can be defined by specifying the type as fmu. Available backend options are 'pyfmi' and 'fmpy' to specify which fmi library python should use to interact with the FMU.                                                   #
+# The path specifies the location of the FMU file or alternatively a directory where multiple FMUs are located. For the latter case you can choose at each startup of the program the FMU that shall be simulated.                         #
+# The numberOfStepsPerCycle specifies how many steps the FMU should take per cycle. This parameter is especially important when the FMU is used in a co-simulation with a PLC. For standalone simulations this parameter can be set to 1.  #  
+# The inputVar and outputVar specifies the variables that should be read from the FMU. The entry names are arbitrary and can be chosen freely with the exception that the name has to be unique as they are used for mapping. The node     #
+# nodeIDs of each inputVar/outputVar specify access path of the variable inside the FMU                                                                                                                                                    #
+############################################################################################################################################################################################################################################
+ModelFMU:   #free choice of name
+  type: fmu-pyfmi           #or fmu-fmpy
+  path: fmu/    #change the path if needed
+  numberOfStepsPerCycle: 100
+  inputVar: #inputs in FMU Model
+    fmu_rPump1Speed:  #name of the variable, no need to be the same as in the model. Better start with fmu_ prefix
+      init: 0
+      nodeID: u_rPump1Speed
+    fmu_rPump2Speed:
+      init: 0
+      nodeID: u_rPump2Speed
+    fmu_rPump3Speed:
+      init: 0
+      nodeID: u_rPump3Speed
+    fmu_rVal1Pos:
+      init: 0
+      nodeID: u_rVal1Pos
+    fmu_rVal2Pos:
+      init: 0
+      nodeID: u_rVal2Pos
+    fmu_rVal3Pos:
+      init: 0
+      nodeID: u_rVal3Pos
+    fmu_bExtHeat:
+      init: 0
+      nodeID: u_bExtHeat
+  outputVar:
+    #Collecter
+    fmu_rTCol1Top_degC:
+      init: 0
+      nodeID: y_rTCol1Top_degC
+    fmu_rTCol2Top_degC:
+      init: 0
+      nodeID: y_rTCol2Top_degC
+    fmu_rTCol3Top_degC:
+      init: 0
+      nodeID: y_rTCol3Top_degC
+    #Tank
+    fmu_rTTan1Top_degC:
+      init: 0
+      nodeID: y_rTTan1Top_degC
+    fmu_rTTan1Mid_degC:
+      init: 0
+      nodeID: y_rTTan1Mid_degC
+    fmu_rTTan1Bot_degC:
+      init: 0
+      nodeID: y_rTTan1Bot_degC
+    fmu_rTTan2Top_degC:
+      init: 0
+      nodeID: y_rTTan2Top_degC
+    fmu_rTTan2Mid_degC:
+      init: 0
+      nodeID: y_rTTan2Mid_degC
+    fmu_rTTan2Bot_degC:
+      init: 0
+      nodeID: y_rTTan2Bot_degC
+    fmu_rTTan3Top_degC:
+      init: 0
+      nodeID: y_rTTan3Top_degC
+    fmu_rTTan3Mid_degC:
+      init: 0
+      nodeID: y_rTTan3Mid_degC
+    fmu_rTTan3Bot_degC:
+      init: 0
+      nodeID: y_rTTan3Bot_degC
+    #Pump
+    fmu_rPump1SpeedAct:
+      init: 0
+      nodeID: y_rPump1SpeedAct
+    fmu_rPump2SpeedAct:
+      init: 0
+      nodeID: y_rPump2SpeedAct
+    fmu_rPump3SpeedAct:
+      init: 0
+      nodeID: y_rPump3SpeedAct
+    #Valve
+    fmu_rVal1PosAct:
+      init: 0
+      nodeID: y_rVal1PosAct
+    fmu_rVal2PosAct:
+      init: 0
+      nodeID: y_rVal2PosAct
+    fmu_rVal3PosAct:
+      init: 0
+      nodeID: y_rVal3PosAct
+######################################################################################################################################################################################
+# The Mapping could also be configured betweem a PLC and a FMU. The following code snippet shows an example of how to configure the mapping between a FMU and a PLC.                #
+# Note that further adjustements are necessary to make this work. The PLC has to run a Watchdog so that the synchronization between the FMU and the PLC is ensured.                 #
+# A Scenario File for external Signal injection could still be used.                                                                                                                #                   
+######################################################################################################################################################################################
+CodeSys:
+  type: plc
+  timeStepPerCycle: 2 #this is the task cycle time in second, normaly is set to 200 ms
+  host: localhost
+  port: '4840'
+  #Nodes for the simulation watchdog
+  finishedNodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.SimulationWatchdog.calculationFinished
+  simulationFinishedNodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.SimulationWatchdog.simulationFinished
+  stepNodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.SimulationWatchdog.doStep
+  terminateNodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.SimulationWatchdog.terminate
+  timePerCycleNodeID: ''
+  runInfinite: true
+  #User parameters starts here:
+  inputVar:
+    #Collecter
+    plc_rTCol1Top_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_colT1
+    plc_rTCol2Top_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_colT2
+    #Tank
+    plc_rTTan1Top_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTTop1
+    plc_rTTan1Mid_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTMid1
+    plc_rTTan1Bot_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTBot1
+    plc_rTTan2Top_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTTop2
+    plc_rTTan2Mid_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTMid2
+    plc_rTTan2Bot_degC:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_tanTBot2
+    #Pump
+    plc_rPump1SpeedAct:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_pumpSpeed1
+    plc_rPump2SpeedAct:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_pumpSpeed2
+    #Valve
+    plc_rVal1PosAct:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_valPos1
+    plc_rVal2PosAct:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.y_valPos2
+  outputVar:
+    plc_rPump1Speed:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.u_pumpSpeed1
+    plc_rPump2Speed:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.u_pumpSpeed2
+    plc_rVal1Pos:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.u_valPos1
+    plc_rVal2Pos:
+      init: 0
+      nodeID: ns=4;s=|var|CODESYS Control Win V3 x64.Application.PRG_solarT2x2.u_valPos2
+######################################################################################################################################################################################
+# A Scenario can define external signals when the FMU is simulated standalone or external signals when simulated in conjunction with a PLC. Thus it only contains outputs.           # 
+# The path specifies the Location of the Scenario file. Alternatively a directory can be set when choosing the scenario file at startup is preferred.                                #
+# The outputVar specifies the variables that should be read from the Scenario file. The entry names are arbitrary and can be chosen freely with the exception                        #     
+# that the names should be unique as they are used for mapping. The nodeID specifies the column name the data should be taken from. The csv file should contain at least a column    #
+# 't' for time data and at least one more data column.                                                                                                                               #
+######################################################################################################################################################################################
+#Scenario:
+#  type: scenario
+#  path:  example/scenario/
+#  outputVar:
+#    scen_u:
+#      init: 0
+#      nodeID: u
+
+######################################################################################################################################################################################
+# A Logger can be used to log the values of the variables that are read from the FMU or the PLC. The path specifies the location where the results should be stored. Thus it only    # 
+# contains inputs. The inputVar specifies the variables that should be logged. The entry names are arbitrary and can be chosen freely with the exception that the names should be    #
+# unique as they are used for mapping. Plots can be configured as shown. The logged raw data will be saved as csv also. The configured nodeIDs specify the column names.             #
+######################################################################################################################################################################################
+Logger:
+  type: logger
+  path: results/
+  usetex: false                 #optional, true for use of Latex renderer
+  fontafamily: sans-serif       #optional, serif for latex style font
+  inputVar:
+    log_rTCol1Top_degC:
+      init: 0
+      nodeID: y_rTCol1Top_degC
+    log_rTCol2Top_degC:
+      init: 0
+      nodeID: y_rTCol2Top_degC
+  plots:
+    step_response:
+      type: time_series
+      title: Filter Step Response
+      subgrid: true              #optional
+      grid: true                 #optional
+      vars:
+      - log_rTCol1Top_degC
+      - log_rTCol2Top_degC
+      legend:                     #optional
+      - u
+      - y
+      xlabel: Time [s]
+      ylabel: Signal Value
+    # scatter_example:
+      # type: scatter
+      # title: Scatter Example
+      # subgrid: true               #optional
+      # grid: true                  #optional
+      # vars:
+      # - log_u
+      # x_var: log_y
+      # legend:                     #optional
+      # - u over y
+      # xlabel: Y with some \LaTeX
+      # ylabel: U
+
+
+
+########################################################################################################################################################################################
+# The Mapping specifies how the variables from the FMU, PLC and Scenario are mapped to each other. The timeStepPerCycle specifies the time which is simulated per step. For standalone #
+# simulation without PLC this equals the FMU step size if numberOfStepsPerCycle is set to 1. For PLC co-simulation the timeStepPerCycle should be set accordingly to the               #
+# desired real time scaling, e.g. to the PLC cycle time for a real time scaling factor of 1. The PreStepMappings specify the mappings that should be done before the call of doStep(). #
+# The postStepMappings specify the mappings that should be done after the doStep() call. The Mappings can be configured from any defined inputVar to an arbitrary amount               #
+# of outputVars. Any inputVar and/or outputVar should only be used once in the mapping section.                                                                                        #
+########################################################################################################################################################################################
+Mapping:
+  preStepMappings: # PLC Output auf FMU (Steuersignal) und Logger
+    plc_rPump1Speed: 
+    - fmu_rPump1Speed
+    #- log_rPump1Speed
+    plc_rPump2Speed:
+    - fmu_rPump2Speed
+    #- log_rPump2Speed
+    plc_rVal1Pos:
+    - fmu_rVal1Pos
+    #- log_rVal1Pos
+    plc_rVal2Pos:
+    - fmu_rVal2Pos
+    #- log_rVal2Pos
+  postStepMappings: # FMU Ausgang auf PLC und Logger (Betriebsstatus)
+    fmu_rTCol1Top_degC: 
+    - plc_rTCol1Top_degC
+    - log_rTCol1Top_degC
+    fmu_rTCol2Top_degC:
+    - plc_rTCol2Top_degC
+    - log_rTCol2Top_degC
+    fmu_rTTan1Top_degC:
+    - plc_rTTan1Top_degC
+    #- log_rTTan1Top_degC
+    fmu_rTTan1Mid_degC:
+    - plc_rTTan1Mid_degC
+    #- log_rTTan1Mid_degC
+    fmu_rTTan1Bot_degC:
+    - plc_rTTan1Bot_degC
+    #- log_rTTan1Bot_degC
+    fmu_rTTan2Top_degC:
+    - plc_rTTan2Top_degC
+    #- log_rTTan1Top_degC
+    fmu_rTTan2Mid_degC:
+    - plc_rTTan2Mid_degC
+    #- log_rTTan1Mid_degC
+    fmu_rTTan2Bot_degC:
+    - plc_rTTan2Bot_degC
+    #- log_rTTan1Bot_degC
+    fmu_rPump1SpeedAct:
+    - plc_rPump1SpeedAct
+    #- log_rPump1SpeedAct
+    fmu_rPump2SpeedAct:
+    - plc_rPump2SpeedAct
+    #- log_rPump2SpeedAct
+    fmu_rVal1PosAct:
+    - plc_rVal1PosAct
+    #- log_rVal1PosAct
+    fmu_rVal2PosAct:
+    - plc_rVal2PosAct
+    #- log_rVal2PosAct
