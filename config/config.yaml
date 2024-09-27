@@ -13,8 +13,10 @@
 ############################################################################################################################################################################################################################################
 ModelFMU:   #free choice of name
   type: fmu-pyfmi           #or fmu-fmpy
+  #type: fmu-fmpy
   path: fmu/    #change the path if needed
-  numberOfStepsPerCycle: 100
+  #numberOfStepsPerCycle: 320
+  numberOfStepsPerCycle: 250
   inputVar: #inputs in FMU Model
     fmu_rPump1Speed:  #name of the variable, no need to be the same as in the model. Better start with fmu_ prefix
       init: 0
@@ -103,7 +105,7 @@ ModelFMU:   #free choice of name
 ######################################################################################################################################################################################
 CodeSys:
   type: plc
-  timeStepPerCycle: 2 #this is the task cycle time in second, normaly is set to 200 ms
+  timeStepPerCycle: 10 #this is the task cycle time in second, normaly is set to 200 ms
   host: localhost
   port: '4840'
   #Nodes for the simulation watchdog
@@ -200,6 +202,24 @@ Logger:
     log_rTCol2Top_degC:
       init: 0
       nodeID: y_rTCol2Top_degC
+    log_rTTan1Bot_degC:
+      init: 0
+      nodeID: y_rTTan1Bot_degC
+    log_rTTan2Bot_degC:
+      init: 0
+      nodeID: y_rTTan2Bot_degC
+    log_rPump1Speed:
+      init: 0
+      nodeID: u_rPump1Speed
+    log_rPump2Speed:
+      init: 0
+      nodeID: u_rPump2Speed
+    log_rVal1Pos:
+      init: 0
+      nodeID: u_rVal1Pos
+    log_rVal2Pos:
+      init: 0
+      nodeID: u_rVal2Pos
   plots:
     step_response:
       type: time_series
@@ -209,9 +229,21 @@ Logger:
       vars:
       - log_rTCol1Top_degC
       - log_rTCol2Top_degC
+      - log_rTTan1Bot_degC
+      - log_rTTan2Bot_degC
+      - log_rPump1Speed
+      - log_rPump2Speed
+      - log_rVal1Pos
+      - log_rVal2Pos
       legend:                     #optional
-      - u
-      - y
+      - TCol1Top_degC
+      - TCol2Top_degC
+      - TTan1Bot_degC
+      - TTan2Bot_degC
+      - Pump1
+      - Pump2
+      - Val1
+      - Val2
       xlabel: Time [s]
       ylabel: Signal Value
     # scatter_example:
@@ -240,16 +272,16 @@ Mapping:
   preStepMappings: # PLC Output auf FMU (Steuersignal) und Logger
     plc_rPump1Speed: 
     - fmu_rPump1Speed
-    #- log_rPump1Speed
+    - log_rPump1Speed
     plc_rPump2Speed:
     - fmu_rPump2Speed
-    #- log_rPump2Speed
+    - log_rPump2Speed
     plc_rVal1Pos:
     - fmu_rVal1Pos
-    #- log_rVal1Pos
+    - log_rVal1Pos
     plc_rVal2Pos:
     - fmu_rVal2Pos
-    #- log_rVal2Pos
+    - log_rVal2Pos
   postStepMappings: # FMU Ausgang auf PLC und Logger (Betriebsstatus)
     fmu_rTCol1Top_degC: 
     - plc_rTCol1Top_degC
@@ -265,16 +297,16 @@ Mapping:
     #- log_rTTan1Mid_degC
     fmu_rTTan1Bot_degC:
     - plc_rTTan1Bot_degC
-    #- log_rTTan1Bot_degC
+    - log_rTTan1Bot_degC
     fmu_rTTan2Top_degC:
     - plc_rTTan2Top_degC
-    #- log_rTTan1Top_degC
+    #- log_rTTan2Top_degC
     fmu_rTTan2Mid_degC:
     - plc_rTTan2Mid_degC
-    #- log_rTTan1Mid_degC
+    #- log_rTTan2Mid_degC
     fmu_rTTan2Bot_degC:
     - plc_rTTan2Bot_degC
-    #- log_rTTan1Bot_degC
+    - log_rTTan2Bot_degC
     fmu_rPump1SpeedAct:
     - plc_rPump1SpeedAct
     #- log_rPump1SpeedAct

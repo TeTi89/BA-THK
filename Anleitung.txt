@@ -6,3 +6,5 @@ Ablauf:
 
 Zum Starten
 PS G:\workspaces\vsCodeProjects\BA-THK> python cs-fmu-mapper/main.py -c config/config.yaml
+
+*'activate' command is not accepted in VScode, you have to switch manually.
